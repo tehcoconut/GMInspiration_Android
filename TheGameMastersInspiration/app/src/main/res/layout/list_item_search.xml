@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/iv_search_list_item"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingTop="5dp"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/iv_search_list_item"
+        android:layout_toEndOf="@+id/iv_search_list_item"
+        android:padding="5dp"
+        android:id="@+id/ll_search_list_item">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="NAME - TYPE (SUBTYPE)"
+            android:textSize="20dp"
+            android:id="@+id/tv_search_name" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_search_rating">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Fun"
+                android:id="@+id/tv_search_rating_fun"
+                android:textSize="16dp"
+                android:paddingEnd="2dp"
+                android:paddingRight="2dp"/>
+
+            <RatingBar
+                style = "?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_search_fun"
+                android:paddingEnd="2dp"
+                android:paddingRight="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Balance"
+                android:textSize="16dp"
+                android:paddingEnd="2dp"
+                android:paddingRight="2dp"
+                android:id="@+id/tv_search_rating_bal" />
+
+            <RatingBar
+                style = "?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_search_bal"/>
+
+            </LinearLayout>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="submitted by USER"
+            android:textSize="16dp"
+
+            android:id="@+id/tv_search_submittedby" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="GAME"
+            android:textSize="16dp"
+
+            android:id="@+id/tv_search_game" />
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

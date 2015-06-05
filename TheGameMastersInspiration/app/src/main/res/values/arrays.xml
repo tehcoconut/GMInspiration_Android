@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="drawerNavNames">
+        <item>Home</item>
+        <item>Inbox</item>
+        <item>My Contributions</item>
+        <item>Contribute</item>
+        <item>Collections</item>
+    </array>
+    
+</resources>
