@@ -49,6 +49,7 @@ public class GMIConnection implements HTTPRequestCallback{
     @Override
     public void onRequestCompleted(String results) {
         listener.onRequestCompleted(results);
+        listener = null;
     }
 
     @Override

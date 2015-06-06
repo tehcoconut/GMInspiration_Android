@@ -28,11 +28,11 @@ import java.util.List;
 public class SearchFragment extends Fragment implements GMIQueryCallback{
 
     TextView tv_search;
-    //LinearLayout ll_search;
+    LinearLayout ll_search;
     ListView lv_search;
     Context context;
 
-    String[] imgs, names, games, usernames;
+    String[] imgs, names, games, usernames, joined;
     double[] avg_funs, avg_bals;
     int[] ids, privacys;
 
@@ -49,7 +49,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
         View v = inflater.inflate(R.layout.fragment_search, container, false);
 
         tv_search = (TextView) v.findViewById(R.id.tv_search);
-        //ll_search = (LinearLayout) v.findViewById(R.id.ll_search);
+        ll_search = (LinearLayout) v.findViewById(R.id.ll_searchContainer);
         lv_search = (ListView) v.findViewById(R.id.lv_search);
 
         return v;
@@ -65,6 +65,8 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
 
         String name = "Name not found";
 
+        ll_search.findViewById(R.id.pb_search_list_loading).setVisibility(View.GONE);
+
         try {
             if(!results.contentEquals("null")) {
                 JSONArray jsonArr = new JSONArray(results);
@@ -76,6 +78,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
                 avg_bals = new double[jsonArr.length()];
                 ids = new int[jsonArr.length()];
                 privacys = new int[jsonArr.length()];
+                joined = new String[jsonArr.length()];
 
                 if (ids.length > 0) {
                     for (int i = 0; i < jsonArr.length(); i++) {
@@ -83,7 +86,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
                         collectResult(jsonObj);
                     }
 
-                    MySearchListAdapter adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games);
+                    MySearchListAdapter adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
                     lv_search.setAdapter(adapter);
                 }
             }
@@ -98,15 +101,21 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
     }
 
     private void collectResult(JSONObject jsonObj) throws JSONException{
-        int id = jsonObj.getInt("id");
+        int id = jsonObj.optInt("id");
         ids[resultcount] = id;
 
-        String img = jsonObj.getString("img");
+        String img = jsonObj.optString("img");
         imgs[resultcount] = img;
 
-        String name = jsonObj.getString("name").trim();
-        String type = jsonObj.getString("type").trim();
-        String sub_type = jsonObj.getString("sub_type").trim();
+        String join = jsonObj.optString("joined");
+        joined[resultcount] = join;
+
+        String username = jsonObj.optString("username");
+        usernames[resultcount] = username;
+
+        String name = jsonObj.optString("name").trim();
+        String type = jsonObj.optString("type").trim();
+        String sub_type = jsonObj.optString("sub_type").trim();
         String ntst;
         if(!sub_type.contentEquals("null") && !sub_type.isEmpty())
             ntst = name + " - " + type + " (" + sub_type + ")";
@@ -114,19 +123,18 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
             ntst = name + " - " + type;
         names[resultcount] = ntst;
 
-        String game = jsonObj.getString("game");
+        String game = jsonObj.optString("game");
         games[resultcount] = game;
 
-        String username = jsonObj.getString("username");
-        usernames[resultcount] = username;
 
-        double avg_fun = jsonObj.getDouble("avg_fun");
+
+        double avg_fun = jsonObj.optDouble("avg_fun");
         avg_funs[resultcount] = avg_fun;
 
-        double avg_balance = jsonObj.getDouble("avg_balance");
+        double avg_balance = jsonObj.optDouble("avg_balance");
         avg_bals[resultcount] = avg_balance;
 
-        int privacy = jsonObj.getInt("privacy");
+        int privacy = jsonObj.optInt("privacy");
         privacys[resultcount] = privacy;
 
         resultcount++;

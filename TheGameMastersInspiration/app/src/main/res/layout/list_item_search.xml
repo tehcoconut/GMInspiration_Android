@@ -12,6 +12,12 @@
         android:layout_alignParentStart="true"
         android:paddingTop="5dp"/>
 
+    <ProgressBar
+        android:id="@+id/pb_search_image_loading"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:indeterminate="true"/>
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"

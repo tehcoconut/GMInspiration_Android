@@ -12,6 +12,12 @@
         android:id="@+id/tv_search" />
 
 
+    <ProgressBar
+        android:id="@+id/pb_search_list_loading"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:indeterminate="true"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

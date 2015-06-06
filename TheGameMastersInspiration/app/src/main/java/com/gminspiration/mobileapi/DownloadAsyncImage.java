@@ -17,8 +17,10 @@ import java.net.URLConnection;
 public class DownloadAsyncImage extends AsyncTask<ImageViewHolder, Void, ImageViewHolder>{
 
     ImageDownloadCallback callback;
+    int position;
 
-    public DownloadAsyncImage(ImageDownloadCallback listener){
+    public DownloadAsyncImage(ImageDownloadCallback listener, int position){
+        this.position = position;
         callback = listener;
     }
 
@@ -33,7 +35,7 @@ public class DownloadAsyncImage extends AsyncTask<ImageViewHolder, Void, ImageVi
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeStream(imageURL.openStream(), null, options);
-                final int REQUIRED_SIZE = 70;
+                final int REQUIRED_SIZE = 100;
 
                 int scale = 1;
                 while (options.outWidth / scale / 2 >= REQUIRED_SIZE &&
@@ -45,6 +47,11 @@ public class DownloadAsyncImage extends AsyncTask<ImageViewHolder, Void, ImageVi
                 options2.inSampleSize = scale;
 
                 holder.bitmap = BitmapFactory.decodeStream(imageURL.openStream(), null, options2);
+
+                if(holder.bitmap != null)
+                    Log.d("DownLoadAsyncImage", "Image Size: "+(holder.bitmap.getByteCount()/1024)+"kb");
+                else
+                    Log.d("DownLoadAsyncImage", "Could not download image, decodeStream gave null");
             }
         }catch(IOException e){
             Log.e("Error", "Downloading Image Failed");
@@ -57,6 +64,6 @@ public class DownloadAsyncImage extends AsyncTask<ImageViewHolder, Void, ImageVi
 
     @Override
     protected void onPostExecute(ImageViewHolder result) {
-        callback.onRequestCompleted(result);
+        callback.onRequestCompleted(result, position);
     }
 }
