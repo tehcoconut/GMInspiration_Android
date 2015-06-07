@@ -4,12 +4,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.gminspiration.tehcoconut.mobileapp.R;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * Created by tehcoconut on 6/4/15.
@@ -64,6 +60,6 @@ public class DownloadAsyncImage extends AsyncTask<ImageViewHolder, Void, ImageVi
 
     @Override
     protected void onPostExecute(ImageViewHolder result) {
-        callback.onRequestCompleted(result, position);
+        callback.onImageDownloaded(result, position);
     }
 }

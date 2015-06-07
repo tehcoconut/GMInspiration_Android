@@ -140,7 +140,9 @@ public class MainActivity extends AppCompatActivity {
 
         dl_left.setDrawerListener(mDrawerToggle);
 
-        openFragment(new HomeFragment());
+        HomeFragment home = new HomeFragment();
+        home.setContext(this);
+        openFragment(home);
 
     }
 
@@ -201,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 SearchFragment sf = new SearchFragment();
                 sf.setContext(MainActivity.this);
+                sf.setConnection(gmic);
                 gmic.searchQuery(query, GMIConnection.SORT_RELEVANCE, sf);
                 openFragment(sf);
                 return false;

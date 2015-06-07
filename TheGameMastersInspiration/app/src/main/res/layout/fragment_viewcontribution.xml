@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:indeterminate="true"
+        android:id="@+id/pb_viewcontri_page_loading" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:background="@color/bright_foreground_material_dark">
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:paddingBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:id="@+id/iv_viewcontri_image"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/ic_action_search"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"/>
+
+                    <ProgressBar
+                        android:id="@+id/pb_viewcontri_image_loading"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:indeterminate="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Combat Raise Undead"
+                    android:id="@+id/tv_viewcontri_name" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Spell (Necromancy 3rd Level)"
+                    android:id="@+id/tv_viewcontri_type_subtype" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="submitted by vdwtanner"
+                    android:id="@+id/tv_viewcontri_submittedby" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="DND 5th Edition"
+                    android:id="@+id/tv_viewcontri_game" />
+
+                <RelativeLayout
+                    android:paddingTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    android:id="@+id/rl_viewcontri_ratings">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Fun"
+                        android:id="@+id/tv_viewcontri_rating_fun"
+                        android:textSize="16dp"
+                        android:paddingEnd="2dp"
+                        android:paddingRight="2dp"/>
+
+                    <RatingBar
+                        style = "?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rb_viewcontri_bal"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/tv_viewcontri_rating_bal"
+                        android:layout_toEndOf="@+id/tv_viewcontri_rating_bal" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Balance"
+                        android:textSize="16dp"
+                        android:paddingEnd="2dp"
+                        android:paddingRight="2dp"
+                        android:id="@+id/tv_viewcontri_rating_bal"
+                        android:layout_below="@id/tv_viewcontri_rating_fun" />
+
+                    <RatingBar
+                        style = "?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rb_viewcontri_fun"
+                        android:paddingEnd="2dp"
+                        android:paddingRight="2dp"
+                        android:layout_alignTop="@+id/tv_viewcontri_rating_bal"
+                        android:layout_toRightOf="@+id/tv_viewcontri_rating_bal"
+                        android:layout_toEndOf="@+id/tv_viewcontri_rating_bal" />
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+
+            <WebView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/wv_viewcontri_description_text" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>

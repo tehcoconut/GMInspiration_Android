@@ -20,11 +20,14 @@ public class BackgroundHTTPRequest extends AsyncTask<Void, Integer, String> {
     private boolean firstGET = true;
     private boolean firstPOST = true;
 
+    private int requestID;
+
     private HTTPRequestCallback listener;
 
-    public BackgroundHTTPRequest(String path, HTTPRequestCallback listener){
+    public BackgroundHTTPRequest(String path, int requestID, HTTPRequestCallback listener){
         this.path = path;
         this.listener = listener;
+        this.requestID = requestID;
     }
 
     public void addGETParam(String key, String value){
@@ -94,12 +97,12 @@ public class BackgroundHTTPRequest extends AsyncTask<Void, Integer, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        listener.onRequestCompleted(s);
+        listener.onRequestCompleted(s, requestID);
     }
 
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
-        listener.onProgressUpdate(values);
+        listener.onProgressUpdate(requestID, values);
     }
 }

@@ -33,6 +33,7 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
     private Context context;
 
     private Bitmap bitmaps[];
+
     private Bitmap default_bitmap;
 
     private ViewGroup parent;
@@ -176,7 +177,7 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
     }
 
     @Override
-    public void onRequestCompleted(ImageViewHolder result, int originalPosition) {
+    public void onImageDownloaded(ImageViewHolder result, int originalPosition) {
 
         result.setProgressBarVisibility(View.GONE);
 

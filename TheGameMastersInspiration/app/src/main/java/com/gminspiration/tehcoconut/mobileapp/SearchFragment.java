@@ -2,17 +2,22 @@ package com.gminspiration.tehcoconut.mobileapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.JsonReader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.gminspiration.mobileapi.GMIConnection;
 import com.gminspiration.mobileapi.GMIQueryCallback;
 
 import org.json.JSONArray;
@@ -32,15 +37,15 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
     ListView lv_search;
     Context context;
 
+    private GMIConnection gmic;
+
+    private MySearchListAdapter adapter;
+
     String[] imgs, names, games, usernames, joined;
     double[] avg_funs, avg_bals;
     int[] ids, privacys;
 
     private int resultcount = 0;
-
-    public void setContext(Context context){
-        this.context = context;
-    }
 
 
     @Nullable
@@ -52,16 +57,79 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
         ll_search = (LinearLayout) v.findViewById(R.id.ll_searchContainer);
         lv_search = (ListView) v.findViewById(R.id.lv_search);
 
+        // This is in case android kills the fragment before we go back to it
+        if(savedInstanceState != null){
+
+            names = savedInstanceState.getStringArray("names");
+            games = savedInstanceState.getStringArray("games");
+            imgs = savedInstanceState.getStringArray("imgs");
+            usernames = savedInstanceState.getStringArray("usernames");
+            joined = savedInstanceState.getStringArray("joined");
+            avg_funs = savedInstanceState.getDoubleArray("avg_funs");
+            avg_bals = savedInstanceState.getDoubleArray("avg_bals");
+            ids = savedInstanceState.getIntArray("ids");
+            privacys = savedInstanceState.getIntArray("privacys");
+
+            ll_search.findViewById(R.id.pb_search_list_loading).setVisibility(View.GONE);
+
+            adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
+            lv_search.setAdapter(adapter);
+
+        }
+
+        // When the fragment becomes visible from the backstack,
+        // android keeps the object, but will call this function again.
+        // So when that happens we need to set the adapter again, since
+        // the GMI callback wont be called again.
+        if(usernames != null){
+            ll_search.findViewById(R.id.pb_search_list_loading).setVisibility(View.GONE);
+
+            lv_search.setAdapter(adapter);
+        }
+
+
+        lv_search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ViewContributionFragment frag = new ViewContributionFragment();
+                frag.setContext(context);
+                frag.setConnection(gmic);
+                gmic.getViewContribution(id, frag);
+                ((MainActivity) context).openFragment(frag);
+            }
+        });
+
         return v;
     }
 
     @Override
-    public void onProgressUpdate(Integer... progress) {
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putStringArray("names", names);
+        outState.putStringArray("games", games);
+        outState.putStringArray("imgs", imgs);
+        outState.putStringArray("usernames", usernames);
+        outState.putStringArray("joined", joined);
+        outState.putDoubleArray("avg_funs", avg_funs);
+        outState.putDoubleArray("avg_bals", avg_bals);
+        outState.putIntArray("ids", ids);
+        outState.putIntArray("privacys", privacys);
+    }
+
+    public void setContext(Context context){
+        this.context = context;
+    }
+
+    public void setConnection(GMIConnection gmic){
+        this.gmic = gmic;
+    }
+
+    @Override
+    public void onProgressUpdate(int requestID, Integer... progress) {
 
     }
 
     @Override
-    public void onRequestCompleted(String results) {
+    public void onRequestCompleted(String results, int requestID) {
 
         String name = "Name not found";
 
@@ -86,7 +154,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
                         collectResult(jsonObj);
                     }
 
-                    MySearchListAdapter adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
+                    adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
                     lv_search.setAdapter(adapter);
                 }
             }
