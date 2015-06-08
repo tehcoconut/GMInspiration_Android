@@ -17,6 +17,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.gminspiration.mobileapi.GMIConnection;
@@ -39,6 +40,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
     TextView tv_search;
     LinearLayout ll_search;
     ListView lv_search;
+    ProgressBar pb_loadMore;
     Context context;
 
     String query;
@@ -67,11 +69,11 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
         lv_search = (ListView) v.findViewById(R.id.lv_search);
 
         flag_loading = true;
+
         triedAndFailed = false;
 
         // This is in case android kills the fragment before we go back to it
         if(savedInstanceState != null){
-
 
             names = savedInstanceState.getStringArrayList("names");
             games = savedInstanceState.getStringArrayList("games");
@@ -107,11 +109,13 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
         lv_search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ViewContributionFragment frag = new ViewContributionFragment();
-                frag.setContext(context);
-                frag.setConnection(gmic);
-                gmic.getViewContribution(id, frag);
-                ((MainActivity) context).openFragment(frag);
+                if(position < usernames.size()) {   // if the user doesnt click on the loading icon
+                    ViewContributionFragment frag = new ViewContributionFragment();
+                    frag.setContext(context);
+                    frag.setConnection(gmic);
+                    gmic.getViewContribution(id, frag);
+                    ((MainActivity) context).openFragment(frag);
+                }
             }
         });
 
@@ -150,8 +154,15 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
         if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount != 0){
             if(!flag_loading && !triedAndFailed){
                 flag_loading = true;
+                adapter.setLoadingMore(true);
                 offset+=PAGE_SIZE;
+                pb_loadMore = new ProgressBar(context);
+                pb_loadMore.setIndeterminate(true);
+                ll_search.addView(pb_loadMore);
                 gmic.searchQuery(query, sort, offset, new LoadMoreCallback());
+            }
+            if(triedAndFailed){
+                adapter.setLoadingMore(false);
             }
         }
     }
@@ -210,6 +221,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
         flag_loading = false;
 
 
+
     }
 
     private void collectResult(JSONObject jsonObj) throws JSONException{
@@ -261,6 +273,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
         @Override
         public void onRequestCompleted(String results, int requestID) {
             try {
+
                 if(!results.contentEquals("null")) {
                     JSONArray jsonArr = new JSONArray(results);
                     int sizebefore = usernames.size();
@@ -271,14 +284,20 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
                             collectResult(jsonObj);
                         }
 
+                        int sizeafter = usernames.size();
+                        if(sizeafter - sizebefore <= 0){
+                            triedAndFailed = true;
+                            adapter.setLoadingMore(false);
+                        }
                         //adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
                         //lv_search.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
                     }
-                    int sizeafter = usernames.size();
-                    if(sizeafter - sizebefore <= 0){
-                        triedAndFailed = true;
-                    }
+
+                }else{
+                    triedAndFailed = true;
+                    adapter.setLoadingMore(false);
+                    adapter.notifyDataSetChanged();
                 }
 
             }catch(JSONException e){
@@ -287,6 +306,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
             }
 
             flag_loading = false;
+
         }
     }
 

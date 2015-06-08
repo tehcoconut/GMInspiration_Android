@@ -6,6 +6,10 @@
     <string name="drawer_open">Opens the drawer</string>
     <string name="drawer_close">Closes the drawer</string>
 
+    <string name="pref_search_category_title">Search Settings</string>
+    <string name="pref_search_images_title">Disable Search Images</string>
+    <string name="pref_search_images_summ">Significally speeds up browsing</string>
+
     <item type="id" name="TAG_VIEW_HOLDER"></item>
     <item type="id" name="TAG_SEARCH_ITEM_TYPE"></item>
 </resources>

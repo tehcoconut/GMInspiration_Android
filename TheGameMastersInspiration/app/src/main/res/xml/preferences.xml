@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_search_category_title"
+        android:key="pref_search_category">
+        <CheckBoxPreference
+            android:key="pref_search_images"
+            android:title="@string/pref_search_images_title"
+            android:summary="@string/pref_search_images_summ"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

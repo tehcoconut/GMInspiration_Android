@@ -1,7 +1,9 @@
 package com.gminspiration.tehcoconut.mobileapp;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -187,6 +189,13 @@ public class MainActivity extends AppCompatActivity {
 
         if(mDrawerToggle.onOptionsItemSelected(item))
             return true;
+
+        switch (item.getItemId()){
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
 
         return super.onOptionsItemSelected(item);
     }
