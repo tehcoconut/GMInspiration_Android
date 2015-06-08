@@ -32,7 +32,7 @@ public class GMIConnection implements HTTPRequestCallback{
         this.api_key = api_key;
     }
 
-    public void searchQuery(String keywords, int sort, GMIQueryCallback listener){
+    public void searchQuery(String keywords, int sort, int offset, GMIQueryCallback listener){
         this.searchListener = listener;
 
         BackgroundHTTPRequest searchRequest = new BackgroundHTTPRequest(SEARCH_PATH, SEARCH_QUERY, this);
@@ -51,6 +51,7 @@ public class GMIConnection implements HTTPRequestCallback{
                 Log.d(TAG, "Invalid sort identifier, defaulting to SORT_RELEVANCE");
                 searchRequest.addGETParam("csort", "relevance");
         }
+        searchRequest.addGETParam("offset", ""+offset);
         searchRequest.addGETParam("api_key", api_key);
 
         searchRequest.execute();

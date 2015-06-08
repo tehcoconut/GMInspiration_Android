@@ -19,6 +19,8 @@ import com.gminspiration.mobileapi.DownloadAsyncImage;
 import com.gminspiration.mobileapi.ImageDownloadCallback;
 import com.gminspiration.mobileapi.ImageViewHolder;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.zip.Inflater;
 
 /**
@@ -26,23 +28,28 @@ import java.util.zip.Inflater;
  */
 public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCallback{
 
-    private String imageURLs[], nameTypeSubtype[], users[], game[], joined[];
+/*    private String imageURLs[], nameTypeSubtype[], users[], game[], joined[];
     private double fun[], bal[];
     private int ids[], privacys[];
+  */
+
+    private ArrayList<String> imageURLs, nameTypeSubtype, users, game, joined;
+    private ArrayList<Double> fun, bal;
+    private ArrayList<Integer> ids, privacys;
+    private ArrayList<Bitmap> bitmaps;
 
     private Context context;
 
-    private Bitmap bitmaps[];
+
 
     private Bitmap default_bitmap;
-
-    private ViewGroup parent;
 
     private LayoutInflater inflater;
     private View rowView = null;
 
 
-    public MySearchListAdapter(Context context, int ids[], int[] privacys, String imageURLs[], String nameTypeSubtype[], double fun[], double bal[], String users[], String game[], String joined[]){
+    public MySearchListAdapter(Context context, ArrayList<Integer> ids, ArrayList<Integer> privacys, ArrayList<String> imageURLs, ArrayList<String> nameTypeSubtype,
+                               ArrayList<Double> fun, ArrayList<Double> bal, ArrayList<String> users, ArrayList<String> game, ArrayList<String> joined){
         this.context = context;
         this.ids = ids;
         this.privacys = privacys;
@@ -56,7 +63,7 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
         this.ids = ids;
         this.joined = joined;
 
-        bitmaps = new Bitmap[ids.length];
+        bitmaps = new ArrayList<Bitmap>();
 
         default_bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_search);
 
@@ -65,7 +72,7 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
 
     @Override
     public int getCount() {
-        return nameTypeSubtype.length;
+        return nameTypeSubtype.size();
     }
 
     @Override
@@ -75,7 +82,7 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
 
     @Override
     public long getItemId(int position) {
-        return ids[position];
+        return ids.get(position);
     }
 
     @Override
@@ -86,15 +93,15 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
-        if(game[position] == null || game[position].contentEquals("")){ // This result must be a user then
+        if(game.get(position) == null || game.get(position).contentEquals("")){ // This result must be a user then
             if(convertView == null) {
                 rowView = inflater.inflate(R.layout.list_item_search_user, parent, false);
-                rowView.setTag("USER");
-            }else if(convertView.getTag().equals("USER")){
+                rowView.setTag(R.id.TAG_SEARCH_ITEM_TYPE, "USER");
+            }else if(convertView.getTag(R.id.TAG_SEARCH_ITEM_TYPE).equals("USER")){
                 rowView = convertView;
             }else{
                 rowView = inflater.inflate(R.layout.list_item_search_user, parent, false);
-                rowView.setTag("USER");
+                rowView.setTag(R.id.TAG_SEARCH_ITEM_TYPE, "USER");
             }
 
             ImageView iv_profile = (ImageView) rowView.findViewById(R.id.iv_search_user_list_item);
@@ -103,33 +110,37 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
             TextView tv_joined = (TextView) rowView.findViewById(R.id.tv_search_user_joined);
 
 
-            tv_username.setText(users[position]);
-            tv_joined.setText("user since " + joined[position].trim());
+            tv_username.setText(users.get(position));
+            tv_joined.setText("user since " + joined.get(position).trim());
 
-            if (bitmaps[position] == null) {
+            if (bitmaps.size() <= position) {
+                pb_loading.setVisibility(View.VISIBLE);
                 iv_profile.setImageResource(R.drawable.ic_action_search);
                 DownloadAsyncImage downloader = new DownloadAsyncImage(this, position);
                 ImageViewHolder holder = new ImageViewHolder();
                 holder.setImageView(iv_profile);
-                holder.setURL(imageURLs[position]);
+                holder.setURL(imageURLs.get(position));
                 holder.setPosition(position);
                 holder.setProgBar((ProgressBar) rowView.findViewById(R.id.pb_search_user_image_loading));
+                rowView.setTag(R.id.TAG_VIEW_HOLDER, imageURLs.get(position));
+                holder.setRowView(rowView);
                 downloader.execute(holder);
             } else {
-                iv_profile.setImageBitmap(Bitmap.createScaledBitmap(bitmaps[position], 120, 120, false));
+                iv_profile.setImageBitmap(Bitmap.createScaledBitmap(bitmaps.get(position), 120, 120, false));
+                rowView.setTag(R.id.TAG_VIEW_HOLDER, imageURLs.get(position));
                 pb_loading.setVisibility(View.GONE);
             }
 
         }else {
             if(convertView == null) {
                 rowView = inflater.inflate(R.layout.list_item_search, parent, false);
-                rowView.setTag("CONTRIBUTION");
-            }else if(convertView.getTag().equals("CONTRIBUTION")){
+                rowView.setTag(R.id.TAG_SEARCH_ITEM_TYPE, "CONTRIBUTION");
+            }else if(convertView.getTag(R.id.TAG_SEARCH_ITEM_TYPE).equals("CONTRIBUTION")){
                 rowView = convertView;
-                Log.d("SearchListAdapter", (String) convertView.getTag());
+                Log.d("SearchListAdapter", (String) convertView.getTag(R.id.TAG_SEARCH_ITEM_TYPE));
             }else{
                 rowView = inflater.inflate(R.layout.list_item_search, parent, false);
-                rowView.setTag("CONTRIBUTION");
+                rowView.setTag(R.id.TAG_SEARCH_ITEM_TYPE, "CONTRIBUTION");
             }
 
             TextView tv_name = (TextView) rowView.findViewById(R.id.tv_search_name);
@@ -144,13 +155,13 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
             RatingBar rb_fun = (RatingBar) rowView.findViewById(R.id.rb_search_fun);
             RatingBar rb_bal = (RatingBar) rowView.findViewById(R.id.rb_search_bal);
 
-            tv_name.setText(nameTypeSubtype[position]);
-            tv_user.setText("submitted by " + users[position]);
-            tv_game.setText(game[position]);
+            tv_name.setText(nameTypeSubtype.get(position));
+            tv_user.setText("submitted by " + users.get(position));
+            tv_game.setText(game.get(position));
 
-            if (fun[position] >= 1) {
-                rb_fun.setRating((float) fun[position]);
-                rb_bal.setRating((float) bal[position]);
+            if (fun.get(position) >= 1) {
+                rb_fun.setRating((float)(double) fun.get(position));
+                rb_bal.setRating((float)(double) bal.get(position));
             } else {
                 tv_fun.setText("Not Yet Rated");
                 tv_bal.setVisibility(View.INVISIBLE);
@@ -158,19 +169,24 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
                 rb_fun.setVisibility(View.INVISIBLE);
             }
 
-            if (bitmaps[position] == null) {
+            if (bitmaps.size() <= position) {
+                pb_image.setVisibility(View.VISIBLE);
                 iv_search.setImageResource(R.drawable.ic_action_search);
                 DownloadAsyncImage downloader = new DownloadAsyncImage(this, position);
                 ImageViewHolder holder = new ImageViewHolder();
                 holder.setImageView(iv_search);
-                holder.setURL(imageURLs[position]);
+                holder.setURL(imageURLs.get(position));
                 holder.setPosition(position);
                 holder.setProgBar((ProgressBar) rowView.findViewById(R.id.pb_search_image_loading));
+                rowView.setTag(R.id.TAG_VIEW_HOLDER, imageURLs.get(position));
+                holder.setRowView(rowView);
                 downloader.execute(holder);
             } else {
-                iv_search.setImageBitmap(Bitmap.createScaledBitmap(bitmaps[position], 120, 120, false));
+                iv_search.setImageBitmap(Bitmap.createScaledBitmap(bitmaps.get(position), 120, 120, false));
+                rowView.setTag(R.id.TAG_VIEW_HOLDER, imageURLs.get(position));
                 pb_image.setVisibility(View.GONE);
             }
+
         }
 
         return rowView;
@@ -182,13 +198,19 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
         result.setProgressBarVisibility(View.GONE);
 
         if (result.getBitmap() == null) {
-            if(originalPosition == result.getPosition())
+            if(result.getURL().contentEquals((String) result.getRowView().getTag(R.id.TAG_VIEW_HOLDER))) {
                 result.getImageView().setImageResource(R.drawable.ic_action_search);
-            bitmaps[result.getPosition()] = default_bitmap;
+                result.getRowView().setTag(R.id.TAG_VIEW_HOLDER, null);
+                result.setRowView(null);
+            }
+            bitmaps.add(default_bitmap);
         } else {
-            if(originalPosition == result.getPosition())
+            if(result.getURL().contentEquals((String) result.getRowView().getTag(R.id.TAG_VIEW_HOLDER))) {
                 result.getImageView().setImageBitmap(Bitmap.createScaledBitmap(result.getBitmap(), 120, 120, false));
-            bitmaps[result.getPosition()] = result.getBitmap();
+                result.getRowView().setTag(R.id.TAG_VIEW_HOLDER, null);
+                result.setRowView(null);
+            }
+            bitmaps.add(result.getBitmap());
         }
     }
 

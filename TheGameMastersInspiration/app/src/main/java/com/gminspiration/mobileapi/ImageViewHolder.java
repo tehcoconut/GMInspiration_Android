@@ -1,6 +1,7 @@
 package com.gminspiration.mobileapi;
 
 import android.graphics.Bitmap;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -13,6 +14,8 @@ public class ImageViewHolder {
     ImageView imageView;
     int position;
     ProgressBar imageLoading;
+    View rowView;
+
 
     public int getPosition(){
         return position;
@@ -24,6 +27,7 @@ public class ImageViewHolder {
     public void setURL(String url){
         imageURL = url;
     }
+    public String getURL(){ return imageURL; }
     public void setImageView(ImageView iv){
         imageView = iv;
     }
@@ -41,5 +45,11 @@ public class ImageViewHolder {
 
     public void setProgBar(ProgressBar imageLoading){
         this.imageLoading = imageLoading;
+    }
+    public void setRowView(View rowView){
+        this.rowView = rowView;
+    }
+    public View getRowView(){
+        return rowView;
     }
 }

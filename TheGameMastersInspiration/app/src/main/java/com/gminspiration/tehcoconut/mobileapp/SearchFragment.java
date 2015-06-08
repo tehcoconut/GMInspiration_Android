@@ -3,6 +3,7 @@ package com.gminspiration.tehcoconut.mobileapp;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.util.JsonReader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -30,22 +32,29 @@ import java.util.List;
 /**
  * Created by tehcoconut on 5/30/15.
  */
-public class SearchFragment extends Fragment implements GMIQueryCallback{
+public class SearchFragment extends Fragment implements GMIQueryCallback, AbsListView.OnScrollListener{
+
+    public static final int PAGE_SIZE = 10;
 
     TextView tv_search;
     LinearLayout ll_search;
     ListView lv_search;
     Context context;
 
+    String query;
+    int sort, offset;
+
     private GMIConnection gmic;
 
     private MySearchListAdapter adapter;
 
-    String[] imgs, names, games, usernames, joined;
-    double[] avg_funs, avg_bals;
-    int[] ids, privacys;
+    private ArrayList<String> imgs, names, usernames, games, joined;
+    private ArrayList<Double> avg_funs, avg_bals;
+    private ArrayList<Integer> ids, privacys;
 
-    private int resultcount = 0;
+    private boolean flag_loading;
+    private boolean triedAndFailed;
+
 
 
     @Nullable
@@ -57,23 +66,28 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
         ll_search = (LinearLayout) v.findViewById(R.id.ll_searchContainer);
         lv_search = (ListView) v.findViewById(R.id.lv_search);
 
+        flag_loading = true;
+        triedAndFailed = false;
+
         // This is in case android kills the fragment before we go back to it
         if(savedInstanceState != null){
 
-            names = savedInstanceState.getStringArray("names");
-            games = savedInstanceState.getStringArray("games");
-            imgs = savedInstanceState.getStringArray("imgs");
-            usernames = savedInstanceState.getStringArray("usernames");
-            joined = savedInstanceState.getStringArray("joined");
-            avg_funs = savedInstanceState.getDoubleArray("avg_funs");
-            avg_bals = savedInstanceState.getDoubleArray("avg_bals");
-            ids = savedInstanceState.getIntArray("ids");
-            privacys = savedInstanceState.getIntArray("privacys");
+
+            names = savedInstanceState.getStringArrayList("names");
+            games = savedInstanceState.getStringArrayList("games");
+            imgs = savedInstanceState.getStringArrayList("imgs");
+            usernames = savedInstanceState.getStringArrayList("usernames");
+            joined = savedInstanceState.getStringArrayList("joined");
+            avg_funs = (ArrayList<Double>) savedInstanceState.get("avg_funs");
+            avg_bals = (ArrayList<Double>) savedInstanceState.get("avg_bals");
+            ids = savedInstanceState.getIntegerArrayList("ids");
+            privacys = savedInstanceState.getIntegerArrayList("privacys");
 
             ll_search.findViewById(R.id.pb_search_list_loading).setVisibility(View.GONE);
 
             adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
             lv_search.setAdapter(adapter);
+            lv_search.setOnScrollListener(this);
 
         }
 
@@ -85,6 +99,8 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
             ll_search.findViewById(R.id.pb_search_list_loading).setVisibility(View.GONE);
 
             lv_search.setAdapter(adapter);
+            lv_search.setOnScrollListener(this);
+
         }
 
 
@@ -104,15 +120,15 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putStringArray("names", names);
-        outState.putStringArray("games", games);
-        outState.putStringArray("imgs", imgs);
-        outState.putStringArray("usernames", usernames);
-        outState.putStringArray("joined", joined);
-        outState.putDoubleArray("avg_funs", avg_funs);
-        outState.putDoubleArray("avg_bals", avg_bals);
-        outState.putIntArray("ids", ids);
-        outState.putIntArray("privacys", privacys);
+        outState.putStringArrayList("names", names);
+        outState.putStringArrayList("games", games);
+        outState.putStringArrayList("imgs", imgs);
+        outState.putStringArrayList("usernames", usernames);
+        outState.putStringArrayList("joined", joined);
+        outState.putSerializable("avg_funs", avg_funs);
+        outState.putSerializable("avg_bals", avg_bals);
+        outState.putIntegerArrayList("ids", ids);
+        outState.putIntegerArrayList("privacys", privacys);
     }
 
     public void setContext(Context context){
@@ -123,6 +139,28 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
         this.gmic = gmic;
     }
 
+    public void setQuerySortOffset(String query, int sort, int offset){
+        this.query = query;
+        this.sort = sort;
+        this.offset = offset;
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if(firstVisibleItem+visibleItemCount == totalItemCount && totalItemCount != 0){
+            if(!flag_loading && !triedAndFailed){
+                flag_loading = true;
+                offset+=PAGE_SIZE;
+                gmic.searchQuery(query, sort, offset, new LoadMoreCallback());
+            }
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
     @Override
     public void onProgressUpdate(int requestID, Integer... progress) {
 
@@ -131,6 +169,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
     @Override
     public void onRequestCompleted(String results, int requestID) {
 
+
         String name = "Name not found";
 
         ll_search.findViewById(R.id.pb_search_list_loading).setVisibility(View.GONE);
@@ -138,17 +177,19 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
         try {
             if(!results.contentEquals("null")) {
                 JSONArray jsonArr = new JSONArray(results);
-                imgs = new String[jsonArr.length()];
-                names = new String[jsonArr.length()];
-                games = new String[jsonArr.length()];
-                usernames = new String[jsonArr.length()];
-                avg_funs = new double[jsonArr.length()];
-                avg_bals = new double[jsonArr.length()];
-                ids = new int[jsonArr.length()];
-                privacys = new int[jsonArr.length()];
-                joined = new String[jsonArr.length()];
+                imgs = new ArrayList<String>();
+                names = new ArrayList<String>();
+                usernames = new ArrayList<String>();
+                games = new ArrayList<String>();
+                joined = new ArrayList<String>();
 
-                if (ids.length > 0) {
+                avg_funs = new ArrayList<Double>();
+                avg_bals = new ArrayList<Double>();
+
+                ids = new ArrayList<Integer>();
+                privacys = new ArrayList<Integer>();
+
+                if (jsonArr.length() > 0) {
                     for (int i = 0; i < jsonArr.length(); i++) {
                         JSONObject jsonObj = jsonArr.getJSONObject(i);
                         collectResult(jsonObj);
@@ -156,6 +197,8 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
 
                     adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
                     lv_search.setAdapter(adapter);
+                    lv_search.setOnScrollListener(this);
+
                 }
             }
 
@@ -164,22 +207,23 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
             tv_search.setText("Error: unable to parse JSON");
         }
 
+        flag_loading = false;
 
 
     }
 
     private void collectResult(JSONObject jsonObj) throws JSONException{
         int id = jsonObj.optInt("id");
-        ids[resultcount] = id;
+        ids.add(id);
 
         String img = jsonObj.optString("img");
-        imgs[resultcount] = img;
+        imgs.add(img);
 
         String join = jsonObj.optString("joined");
-        joined[resultcount] = join;
+        joined.add(join);
 
         String username = jsonObj.optString("username");
-        usernames[resultcount] = username;
+        usernames.add(username);
 
         String name = jsonObj.optString("name").trim();
         String type = jsonObj.optString("type").trim();
@@ -189,23 +233,61 @@ public class SearchFragment extends Fragment implements GMIQueryCallback{
             ntst = name + " - " + type + " (" + sub_type + ")";
         else
             ntst = name + " - " + type;
-        names[resultcount] = ntst;
+        names.add(ntst);
 
         String game = jsonObj.optString("game");
-        games[resultcount] = game;
+        games.add(game);
 
 
 
         double avg_fun = jsonObj.optDouble("avg_fun");
-        avg_funs[resultcount] = avg_fun;
+        avg_funs.add(avg_fun);
 
         double avg_balance = jsonObj.optDouble("avg_balance");
-        avg_bals[resultcount] = avg_balance;
+        avg_bals.add(avg_balance);
 
         int privacy = jsonObj.optInt("privacy");
-        privacys[resultcount] = privacy;
+        privacys.add(privacy);
 
-        resultcount++;
 
     }
+
+    private class LoadMoreCallback implements GMIQueryCallback{
+        @Override
+        public void onProgressUpdate(int requestID, Integer... progress) {
+
+        }
+
+        @Override
+        public void onRequestCompleted(String results, int requestID) {
+            try {
+                if(!results.contentEquals("null")) {
+                    JSONArray jsonArr = new JSONArray(results);
+                    int sizebefore = usernames.size();
+
+                    if (jsonArr.length() > 0) {
+                        for (int i = 0; i < jsonArr.length(); i++) {
+                            JSONObject jsonObj = jsonArr.getJSONObject(i);
+                            collectResult(jsonObj);
+                        }
+
+                        //adapter = new MySearchListAdapter(context, ids, privacys, imgs, names, avg_funs, avg_bals, usernames, games, joined);
+                        //lv_search.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                    }
+                    int sizeafter = usernames.size();
+                    if(sizeafter - sizebefore <= 0){
+                        triedAndFailed = true;
+                    }
+                }
+
+            }catch(JSONException e){
+                e.printStackTrace();
+                tv_search.setText("Error: unable to parse JSON");
+            }
+
+            flag_loading = false;
+        }
+    }
+
 }

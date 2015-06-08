@@ -204,7 +204,8 @@ public class MainActivity extends AppCompatActivity {
                 SearchFragment sf = new SearchFragment();
                 sf.setContext(MainActivity.this);
                 sf.setConnection(gmic);
-                gmic.searchQuery(query, GMIConnection.SORT_RELEVANCE, sf);
+                sf.setQuerySortOffset(query, GMIConnection.SORT_RELEVANCE, 0);
+                gmic.searchQuery(query, GMIConnection.SORT_RELEVANCE, 0, sf);
                 openFragment(sf);
                 return false;
             }

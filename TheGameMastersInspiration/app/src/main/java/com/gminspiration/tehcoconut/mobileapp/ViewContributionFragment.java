@@ -114,7 +114,10 @@ public class ViewContributionFragment extends Fragment implements GMIQueryCallba
                 privacy = jsonObj.getInt("privacy");
 
                 tv_name.setText(name);
-                tv_type_subtype.setText(type.trim()+" ("+sub_type+")");
+                if(!sub_type.contentEquals("null") && !sub_type.isEmpty())
+                    tv_type_subtype.setText(type.trim()+" ("+sub_type+")");
+                else
+                    tv_type_subtype.setText(type.trim());
                 tv_submittedby.setText("submitted by " + username.trim());
                 tv_game.setText(game.trim());
 

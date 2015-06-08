@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:indeterminate="true"
-        android:id="@+id/pb_viewcontri_page_loading" />
+        android:id="@+id/pb_viewcontri_page_loading"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -103,7 +103,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/rb_viewcontri_bal"
-                        android:layout_centerVertical="true"
+                        android:layout_above="@+id/tv_viewcontri_rating_bal"
                         android:layout_toRightOf="@+id/tv_viewcontri_rating_bal"
                         android:layout_toEndOf="@+id/tv_viewcontri_rating_bal" />
 
