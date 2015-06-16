@@ -17,15 +17,18 @@ public class GMIConnection implements HTTPRequestCallback{
 
     public static final int SEARCH_QUERY=0;
     public static final int VIEW_CONTRIBUTION_QUERY=1;
+    public static final int HOT_CONTRIBUTIONS_QUERY=2;
 
 
     public static final String SEARCH_PATH="http://gminspiration.com/zac/mobile_api/search-results.php";
     public static final String VIEW_CONTRIBUTION_PATH = "http://gminspiration.com/zac/mobile_api/view-contribution.php";
+    public static final String HOT_CONTRIBUTION_PATH = "http://gminspiration.com/zac/mobile_api/hot-contributions.php";
 
 
     String api_key = "";
     GMIQueryCallback searchListener;
     GMIQueryCallback viewcontriListener;
+    GMIQueryCallback hotcontriListener;
 
 
     public GMIConnection(String api_key){
@@ -69,6 +72,14 @@ public class GMIConnection implements HTTPRequestCallback{
 
     }
 
+    public void getHotContributions(GMIQueryCallback listener) {
+        this.hotcontriListener = listener;
+        BackgroundHTTPRequest hotcontriRequest = new BackgroundHTTPRequest(HOT_CONTRIBUTION_PATH, HOT_CONTRIBUTIONS_QUERY, this);
+        hotcontriRequest.addGETParam("api_key", api_key);
+
+        hotcontriRequest.execute();
+    }
+
 
     @Override
     public void onRequestCompleted(String results, int requestID) {
@@ -81,6 +92,7 @@ public class GMIConnection implements HTTPRequestCallback{
                     Log.d(TAG, "Unable to find search query callback, reference is null");
                 }
                 break;
+
             case VIEW_CONTRIBUTION_QUERY:
                 if(viewcontriListener != null){
                     viewcontriListener.onRequestCompleted(results, requestID);
@@ -89,6 +101,15 @@ public class GMIConnection implements HTTPRequestCallback{
                     Log.d(TAG, "Unable to find view contribution callback, reference is null");
                 }
                 break;
+
+            case HOT_CONTRIBUTIONS_QUERY:
+                if(hotcontriListener != null){
+                    hotcontriListener.onRequestCompleted(results, requestID);
+                    hotcontriListener = null;
+                }else{
+                    Log.d(TAG, "Unable to find hot contribution callback, reference is null");
+                }
+
             default:
                 Log.d(TAG, "Unknown requestID");
         }
@@ -104,6 +125,7 @@ public class GMIConnection implements HTTPRequestCallback{
                     Log.d(TAG, "Unable to find search query callback, reference is null");
                 }
                 break;
+
             case VIEW_CONTRIBUTION_QUERY:
                 if(viewcontriListener != null){
                     searchListener.onProgressUpdate(requestID, progress);
@@ -111,6 +133,14 @@ public class GMIConnection implements HTTPRequestCallback{
                     Log.d(TAG, "Unable to find view contribution callback, reference is null");
                 }
                 break;
+
+            case HOT_CONTRIBUTIONS_QUERY:
+                if(hotcontriListener != null){
+                    hotcontriListener.onProgressUpdate(requestID, progress);
+                }else{
+                    Log.d(TAG, "Unable to find hot contribution callback, reference is null");
+                }
+
             default:
                 Log.d(TAG, "Unknown requestID");
         }

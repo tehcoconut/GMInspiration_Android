@@ -50,6 +50,7 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
     private View rowView = null;
 
     private Boolean loadingMore;
+    private Boolean loaderFlag;
 
     private SharedPreferences sharedPref;
 
@@ -74,10 +75,15 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
         default_bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_search);
 
         loadingMore = true;
+        loaderFlag = true;
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 
         System.gc();
+    }
+
+    public void setLoaderFlag(boolean flag){
+        this.loaderFlag = flag;
     }
 
     public void setLoadingMore(Boolean loadingMore){
@@ -86,7 +92,10 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
 
     @Override
     public int getCount() {
-        return nameTypeSubtype.size()+1;
+        if(loaderFlag)
+            return nameTypeSubtype.size()+1;
+        else
+            return nameTypeSubtype.size();
     }
 
     @Override
@@ -201,9 +210,9 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
                 rb_bal.setRating((float)(double) bal.get(position));
             } else {
                 tv_fun.setText("Not Yet Rated");
-                tv_bal.setVisibility(View.INVISIBLE);
-                rb_bal.setVisibility(View.INVISIBLE);
-                rb_fun.setVisibility(View.INVISIBLE);
+                tv_bal.setVisibility(View.GONE);
+                rb_bal.setVisibility(View.GONE);
+                rb_fun.setVisibility(View.GONE);
             }
 
             if (!imagesDisabled) {

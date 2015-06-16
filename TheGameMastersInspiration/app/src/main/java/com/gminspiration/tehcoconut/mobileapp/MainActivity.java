@@ -78,14 +78,24 @@ public class MainActivity extends AppCompatActivity {
 
                 if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
                     dl_left.closeDrawers();
+                    HomeFragment home;
+
                     switch (rv_left.getChildAdapterPosition(child)) {
                         case 0:
                             Toast.makeText(MainActivity.this, "CASE 0", Toast.LENGTH_SHORT).show();
-                            openFragment(new HomeFragment());
+                            home = new HomeFragment();
+                            home.setContext(MainActivity.this);
+                            home.setConnection(gmic);
+                            gmic.getHotContributions(home);
+                            openFragment(home);
                             break;
                         case 1:
                             Toast.makeText(MainActivity.this, "CASE 1", Toast.LENGTH_SHORT).show();
-                            openFragment(new HomeFragment());
+                            home = new HomeFragment();
+                            home.setContext(MainActivity.this);
+                            home.setConnection(gmic);
+                            gmic.getHotContributions(home);
+                            openFragment(home);
                             break;
                         case 2:
                             Toast.makeText(MainActivity.this, "CASE 2", Toast.LENGTH_SHORT).show();
@@ -144,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
 
         HomeFragment home = new HomeFragment();
         home.setContext(this);
+        home.setConnection(gmic);
+        gmic.getHotContributions(home);
         openFragment(home);
 
     }
@@ -152,14 +164,14 @@ public class MainActivity extends AppCompatActivity {
         String backStateName = fragment.getClass().getName();
 
         FragmentManager fm = getSupportFragmentManager();
-        boolean fragPopped = fm.popBackStackImmediate(backStateName, 0);
 
-        if(!fragPopped) {
-            FragmentTransaction fg = fm.beginTransaction();
-            fg.replace(R.id.container, fragment);
-            fg.addToBackStack(backStateName);
-            fg.commit();
-        }
+        // make the flag param 0 for each search to be saved on the backstack
+        boolean fragPopped = fm.popBackStackImmediate(backStateName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        FragmentTransaction fg = fm.beginTransaction();
+        fg.replace(R.id.container, fragment);
+        fg.addToBackStack(backStateName);
+        fg.commit();
 
     }
 
