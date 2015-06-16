@@ -46,6 +46,9 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
     String query;
     int sort, offset;
 
+    String category;
+    String gameMustMatch;
+
     private GMIConnection gmic;
 
     private MySearchListAdapter adapter;
@@ -64,7 +67,6 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search, container, false);
 
-        tv_search = (TextView) v.findViewById(R.id.tv_search);
         ll_search = (LinearLayout) v.findViewById(R.id.ll_searchContainer);
         lv_search = (ListView) v.findViewById(R.id.lv_search);
 
@@ -143,6 +145,11 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
         this.gmic = gmic;
     }
 
+    public void setCategoryGame(String category, String game){
+        this.category = category;
+        this.gameMustMatch = game;
+    }
+
     public void setQuerySortOffset(String query, int sort, int offset){
         this.query = query;
         this.sort = sort;
@@ -159,7 +166,7 @@ public class SearchFragment extends Fragment implements GMIQueryCallback, AbsLis
                 pb_loadMore = new ProgressBar(context);
                 pb_loadMore.setIndeterminate(true);
                 ll_search.addView(pb_loadMore);
-                gmic.searchQuery(query, sort, offset, new LoadMoreCallback());
+                gmic.searchQuery(query, sort, offset, category, gameMustMatch, new LoadMoreCallback());
             }
             if(triedAndFailed){
                 adapter.setLoadingMore(false);

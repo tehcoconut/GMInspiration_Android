@@ -226,7 +226,8 @@ public class MainActivity extends AppCompatActivity {
                 sf.setContext(MainActivity.this);
                 sf.setConnection(gmic);
                 sf.setQuerySortOffset(query, GMIConnection.SORT_RELEVANCE, 0);
-                gmic.searchQuery(query, GMIConnection.SORT_RELEVANCE, 0, sf);
+                sf.setCategoryGame("All", "All");
+                gmic.searchQuery(query, GMIConnection.SORT_RELEVANCE, 0, "All", "All", sf);
                 openFragment(sf);
                 return false;
             }

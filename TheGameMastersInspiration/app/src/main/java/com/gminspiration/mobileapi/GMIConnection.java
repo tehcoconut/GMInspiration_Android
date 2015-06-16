@@ -18,24 +18,27 @@ public class GMIConnection implements HTTPRequestCallback{
     public static final int SEARCH_QUERY=0;
     public static final int VIEW_CONTRIBUTION_QUERY=1;
     public static final int HOT_CONTRIBUTIONS_QUERY=2;
+    public static final int GAME_LIST_QUERY=3;
 
 
     public static final String SEARCH_PATH="http://gminspiration.com/zac/mobile_api/search-results.php";
     public static final String VIEW_CONTRIBUTION_PATH = "http://gminspiration.com/zac/mobile_api/view-contribution.php";
     public static final String HOT_CONTRIBUTION_PATH = "http://gminspiration.com/zac/mobile_api/hot-contributions.php";
+    public static final String GAME_LIST_PATH = "http://gminspiration.com/zac/mobile_api/list-games.php";
 
 
     String api_key = "";
     GMIQueryCallback searchListener;
     GMIQueryCallback viewcontriListener;
     GMIQueryCallback hotcontriListener;
+    GMIQueryCallback gamelistListener;
 
 
     public GMIConnection(String api_key){
         this.api_key = api_key;
     }
 
-    public void searchQuery(String keywords, int sort, int offset, GMIQueryCallback listener){
+    public void searchQuery(String keywords, int sort, int offset, String type, String game, GMIQueryCallback listener){
         this.searchListener = listener;
 
         BackgroundHTTPRequest searchRequest = new BackgroundHTTPRequest(SEARCH_PATH, SEARCH_QUERY, this);
@@ -53,6 +56,12 @@ public class GMIConnection implements HTTPRequestCallback{
             default:
                 Log.d(TAG, "Invalid sort identifier, defaulting to SORT_RELEVANCE");
                 searchRequest.addGETParam("csort", "relevance");
+        }
+        if(!type.contentEquals("") && !type.contentEquals("All")){
+            searchRequest.addGETParam("type", type);
+        }
+        if(!game.contentEquals("") && !game.contentEquals("All")){
+            searchRequest.addGETParam("game", game);
         }
         searchRequest.addGETParam("offset", ""+offset);
         searchRequest.addGETParam("api_key", api_key);
@@ -80,6 +89,13 @@ public class GMIConnection implements HTTPRequestCallback{
         hotcontriRequest.execute();
     }
 
+    public void getGameList(GMIQueryCallback listener){
+        this.gamelistListener = listener;
+        BackgroundHTTPRequest gamelistRequest = new BackgroundHTTPRequest(GAME_LIST_PATH, GAME_LIST_QUERY, this);
+        gamelistRequest.addGETParam("api_key", api_key);
+
+        gamelistRequest.execute();
+    }
 
     @Override
     public void onRequestCompleted(String results, int requestID) {
@@ -109,6 +125,16 @@ public class GMIConnection implements HTTPRequestCallback{
                 }else{
                     Log.d(TAG, "Unable to find hot contribution callback, reference is null");
                 }
+                break;
+
+            case GAME_LIST_QUERY:
+                if(gamelistListener != null){
+                    gamelistListener.onRequestCompleted(results, requestID);
+                    gamelistListener = null;
+                }else{
+                    Log.d(TAG, "Unable to find game list callback, reference is null");
+                }
+                break;
 
             default:
                 Log.d(TAG, "Unknown requestID");
@@ -140,6 +166,15 @@ public class GMIConnection implements HTTPRequestCallback{
                 }else{
                     Log.d(TAG, "Unable to find hot contribution callback, reference is null");
                 }
+                break;
+
+            case GAME_LIST_QUERY:
+                if(gamelistListener != null){
+                    gamelistListener.onProgressUpdate(requestID, progress);
+                }else{
+                    Log.d(TAG, "Unable to find game list callback, reference is null");
+                }
+                break;
 
             default:
                 Log.d(TAG, "Unknown requestID");

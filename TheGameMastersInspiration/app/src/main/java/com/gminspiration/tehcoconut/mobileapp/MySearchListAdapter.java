@@ -206,6 +206,10 @@ public class MySearchListAdapter extends BaseAdapter implements ImageDownloadCal
             tv_game.setText(game.get(position));
 
             if (fun.get(position) >= 1) {
+                tv_fun.setText("Fun");
+                tv_bal.setVisibility(View.VISIBLE);
+                rb_bal.setVisibility(View.VISIBLE);
+                rb_fun.setVisibility(View.VISIBLE);
                 rb_fun.setRating((float)(double) fun.get(position));
                 rb_bal.setRating((float)(double) bal.get(position));
             } else {

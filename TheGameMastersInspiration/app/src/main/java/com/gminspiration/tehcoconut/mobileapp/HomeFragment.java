@@ -83,6 +83,51 @@ public class HomeFragment extends Fragment implements GMIQueryCallback{
 
         lv_categories.setAdapter(arrayAdapter);
 
+        lv_categories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String type;
+                switch (position){
+                    case 0:         // ALL
+                        type = "";
+                        break;
+                    case 1:         // ARMOR
+                        type = "Armor";
+                        break;
+                    case 2:         // CLASSES
+                        type = "Class";
+                        break;
+                    case 3:         // FEATS
+                        type = "Feat";
+                        break;
+                    case 4:         // ITEMS
+                        type = "Item";
+                        break;
+                    case 5:         // MONSTERS
+                        type = "Monster";
+                        break;
+                    case 6:         // RACES
+                        type = "Race";
+                        break;
+                    case 7:         // SPELLS
+                        type = "Spell";
+                        break;
+                    case 8:         // WEAPONS
+                        type = "Weapon";
+                        break;
+                    default:        // ALL
+                        type = "";
+                }
+
+                GameSelectFragment frag = new GameSelectFragment();
+                frag.setContext(context);
+                frag.setConnection(gmic);
+                frag.setCategory(type);
+                gmic.getGameList(frag);
+                ((MainActivity) context).openFragment(frag);
+            }
+        });
+
         //setListViewHeightWrapItems(lv_hotcontri);
         setListViewHeightWrapItems(lv_categories, false);
 
